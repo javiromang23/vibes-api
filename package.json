@@ -1,0 +1,25 @@
+{
+  "name": "vibes-api",
+  "version": "1.0.0",
+  "description": "API REST con MongoDB y NodeJS. Red social Vibes en el lado del servidor.",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Javier Román",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.19.0",
+    "connect-multiparty": "^2.2.0",
+    "crypto": "^1.0.1",
+    "express": "^4.16.4",
+    "jwt-simple": "^0.5.6",
+    "moment": "^2.24.0",
+    "mongoose": "^5.5.5"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.0"
+  }
+}
