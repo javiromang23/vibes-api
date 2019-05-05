@@ -11,7 +11,12 @@ const UserSchema = new Schema({
   username: { type: String, unique: true, lowercase: true, required: true },
   password: { type: String, required: true },
   name: { type: String, required: true },
-  typeAccount: { type: String, required: true, default: "public" },
+  typeAccount: {
+    type: String,
+    required: true,
+    lowercase: true,
+    default: "public"
+  },
   signUpDate: { type: Date, default: Date.now() },
   avatar: { type: String, default: "default_profile.png" },
   /** Optional */
@@ -34,6 +39,27 @@ UserSchema.pre("save", function(next) {
       next();
     });
   });
+});
+
+UserSchema.pre("findOneAndUpdate", function(next) {
+  let password = this._update.password;
+  if (!password) {
+    return next();
+  }
+  try {
+    bcrypt.genSalt(10, (err, salt) => {
+      if (err) return next();
+
+      bcrypt.hash(password, salt, null, (err, hash) => {
+        if (err) return next(err);
+
+        this._update.password = hash;
+        next();
+      });
+    });
+  } catch (err) {
+    return next(err);
+  }
 });
 
 module.exports = mongoose.model("User", UserSchema);

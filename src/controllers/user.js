@@ -52,39 +52,26 @@ const userController = {
     User.findOne({ username: req.params.username }, (err, user) => {
       if (err) return res.status(500).send({ message: err });
       if (!user) return res.status(404).send({ message: "User not found" });
-      user.password = undefined;
       return res.status(200).send({ message: "User sent", user: user });
-    });
+    }).select("-password");
   },
-  updateUser: (req, res) => {
-    let user = new User();
-
-    /* Permissions validation */
-    User.findOne({ username: req.params.username }, (err, userSelected) => {
-      if (err) return res.status(500).send({ message: err });
-      if (userSelected) {
-        if (req.user != userSelected._id) {
-          return res.status(403).send({
-            message:
-              "Forbidden: You don't have permission to access on this user"
-          });
-        }
-      }
-    });
+  updateUser: async (req, res) => {
+    let user = {};
 
     /* Email validation */
     if (req.body.email != "" && req.body.email != undefined) {
       if (
-        /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/.test(
-          req.body.email
-        )
+        /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/.test(req.body.email)
       ) {
-        User.findOne({ email: req.body.email }, (err, user) => {
-          if (err) return res.status(500).send({ message: err });
-          if (user)
+        try {
+          let userFound = await User.findOne({ email: req.body.email });
+          if (userFound) {
             return res.status(400).send({ message: "Email is not available" });
-          user.email = email;
-        });
+          }
+          user.email = req.body.email;
+        } catch (err) {
+          return res.status(500).send({ message: `Error server: ${err}` });
+        }
       } else {
         return res.status(400).send({ message: "Email is not available" });
       }
@@ -92,12 +79,15 @@ const userController = {
 
     /* Username validation */
     if (req.body.username != "" && req.body.username != undefined) {
-      User.findOne({ username: req.body.username }, (err, user) => {
-        if (err) return res.status(500).send({ message: err });
-        if (user)
+      try {
+        let userFound = await User.findOne({ username: req.body.username });
+        if (userFound) {
           return res.status(400).send({ message: "Username is not available" });
-        user.username = req.body.email;
-      });
+        }
+        user.username = req.body.username;
+      } catch (err) {
+        return res.status(500).send({ message: `Error server: ${err}` });
+      }
     }
 
     /* Name validation */
@@ -116,9 +106,9 @@ const userController = {
         req.body.typeAccount.toLowerCase() != "public" &&
         req.body.typeAccount.toLowerCase() != "private"
       ) {
-        user.typeAccount = req.body.typeAccount;
-      } else {
         return res.status(400).send({ message: "Invalid typeAccount" });
+      } else {
+        user.typeAccount = req.body.typeAccount;
       }
     }
 
@@ -148,19 +138,19 @@ const userController = {
         req.body.sex.toLowerCase() != "shemale" &&
         req.body.sex.toLowerCase() != "other"
       ) {
-        user.sex = req.body.sex;
-      } else {
         return res.status(400).send({ message: "Invalid sex" });
+      } else {
+        user.sex = req.body.sex;
       }
     }
 
     /* Avatar validation */
     if (req.files.avatar != "" && req.files.avatar != undefined) {
-      var filePath = req.files.avatar.path;
-      var fileSplit = filePath.split("\\");
-      var fileName = fileSplit[fileSplit.length - 1];
-      var extSplit = fileName.split(".");
-      var fileExt = extSplit[1];
+      let filePath = req.files.avatar.path;
+      let fileSplit = filePath.split("\\");
+      let fileName = fileSplit[fileSplit.length - 1];
+      let extSplit = fileName.split(".");
+      let fileExt = extSplit[1].toLowerCase();
 
       // Extensions file validation
       if (
@@ -169,9 +159,27 @@ const userController = {
         fileExt == "jpeg" ||
         fileExt == "gif"
       ) {
-        user.avatar = fileName;
+        try {
+          let folder = path.resolve(
+            __dirname +
+              "/../../uploads/users/" +
+              req.params.username +
+              "/avatars/"
+          );
+          if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder, { recursive: true });
+          }
+          let newPathFile =
+            folder + fileName + path.extname(filePath).toLowerCase();
+          fs.rename(filePath, newPathFile, err => {
+            if (err) throw err;
+          });
+          user.avatar = fileName;
+        } catch (err) {
+          return res.status(500).send({ message: `Error server: ${err}` });
+        }
       } else {
-        return removeFilesUploads(res, file_path, "Imágen no válida");
+        return removeFilesUploads(res, file_path, "Image not valid.");
       }
     }
 
@@ -188,8 +196,14 @@ const userController = {
 
         return res.status(200).send({ user: userUpdated });
       }
-    );
+    ).select("-password");
   }
 };
 
 module.exports = userController;
+
+function removeFilesUploads(res, file_path, message) {
+  fs.unlink(file_path, err => {
+    return res.status(400).send({ message: message });
+  });
+}

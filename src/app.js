@@ -1,16 +1,18 @@
 "use strict";
 
-var express = require("express");
-var bodyParser = require("body-parser");
+const express = require("express");
+const bodyParser = require("body-parser");
+const multipart = require("connect-multiparty");
 
-var app = express();
+const app = express();
 
 /* Route Files */
-var userRoutes = require("./routes/user");
+const userRoutes = require("./routes/user");
 
 /** Middlewares **/
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(multipart());
 
 /** CORS **/
 app.use((req, res, next) => {
