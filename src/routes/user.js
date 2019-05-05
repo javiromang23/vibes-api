@@ -15,5 +15,10 @@ api.put(
 );
 api.post("/signin", userController.signIn);
 api.post("/signup", userController.signUp);
+api.delete(
+  "/user/:username",
+  [auth, permissions.permissionsValidation],
+  userController.deleteUser
+);
 
 module.exports = api;

@@ -179,7 +179,7 @@ const userController = {
           return res.status(500).send({ message: `Error server: ${err}` });
         }
       } else {
-        return removeFilesUploads(res, file_path, "Image not valid.");
+        return removeFilesUploads(res, filePath, "Image not valid.");
       }
     }
 
@@ -197,6 +197,23 @@ const userController = {
         return res.status(200).send({ user: userUpdated });
       }
     ).select("-password");
+  },
+  deleteUser: async (req, res) => {
+    try {
+      let userDeleted = await User.deleteOne({ username: req.params.username });
+      console.log(userDeleted);
+      if (!userDeleted)
+        return res.status(404).send({ message: `User not found` });
+
+      let folder = path.resolve(
+        __dirname + "/../../uploads/users/" + req.params.username
+      );
+      deleteFolderRecursive(folder);
+
+      return res.status(200).send({ message: `User deleted` });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 
@@ -206,4 +223,24 @@ function removeFilesUploads(res, file_path, message) {
   fs.unlink(file_path, err => {
     return res.status(400).send({ message: message });
   });
+}
+
+function deleteFolderRecursive(path) {
+  try {
+    if (fs.existsSync(path)) {
+      fs.readdirSync(path).forEach(function(file) {
+        var curPath = path + "/" + file;
+        if (fs.lstatSync(curPath).isDirectory()) {
+          // recurse
+          deleteFolderRecursive(curPath);
+        } else {
+          // delete file
+          fs.unlinkSync(curPath);
+        }
+      });
+      fs.rmdirSync(path);
+    }
+  } catch (err) {
+    return err;
+  }
 }
