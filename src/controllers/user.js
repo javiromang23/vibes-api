@@ -151,6 +151,7 @@ const userController = {
       let fileName = fileSplit[fileSplit.length - 1];
       let extSplit = fileName.split(".");
       let fileExt = extSplit[1].toLowerCase();
+      fileName = extSplit[0];
 
       // Extensions file validation
       if (
@@ -169,12 +170,11 @@ const userController = {
           if (!fs.existsSync(folder)) {
             fs.mkdirSync(folder, { recursive: true });
           }
-          let newPathFile =
-            folder + fileName + path.extname(filePath).toLowerCase();
-          fs.rename(filePath, newPathFile, err => {
+          let newPathFile = path.resolve(folder + "/" + fileName);
+          fs.rename(filePath, newPathFile + "." + fileExt, err => {
             if (err) throw err;
           });
-          user.avatar = fileName;
+          user.avatar = fileName + "." + fileExt;
         } catch (err) {
           return res.status(500).send({ message: `Error server: ${err}` });
         }
@@ -214,6 +214,23 @@ const userController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  getImageFile: (req, res) => {
+    var path_file = path.resolve(
+      __dirname +
+        "/../../uploads/users/" +
+        req.params.username +
+        "/avatars/" +
+        req.params.imageFile
+    );
+
+    fs.exists(path_file, exists => {
+      if (exists) {
+        res.sendFile(path.resolve(path_file));
+      } else {
+        res.status(200).send({ message: "No existe la imagen" });
+      }
+    });
   }
 };
 

@@ -8,6 +8,7 @@ const api = express.Router();
 
 api.get("/test-user", userController.test);
 api.get("/user/:username", auth, userController.getUser);
+api.get("/user/:username/:imageFile", auth, userController.getImageFile);
 api.put(
   "/user/:username",
   [auth, permissions.permissionsValidation],
