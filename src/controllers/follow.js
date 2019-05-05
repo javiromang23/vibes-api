@@ -69,6 +69,25 @@ const followController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  unFollow: async (req, res) => {
+    try {
+      let userFound = await User.findOne({ username: req.body.username });
+      if (!userFound) {
+        res.status(404).send({ message: "User not found" });
+      }
+
+      let followDeleted = await Follow.findOneAndDelete({
+        user: userFound.id,
+        followed: req.user
+      });
+      if (!followDeleted) {
+        res.status(404).send({ message: "The request could not be accepted" });
+      }
+      return res.status(200).send({ message: "Unfollow done" });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 
