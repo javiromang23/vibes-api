@@ -8,6 +8,7 @@ const app = express();
 
 /* Route Files */
 const userRoutes = require("./routes/user");
+const followRoutes = require("./routes/follow");
 
 /** Middlewares **/
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -29,5 +30,6 @@ app.use((req, res, next) => {
 
 /** Routes **/
 app.use("/api", userRoutes);
+app.use("/api", followRoutes);
 
 module.exports = app;
