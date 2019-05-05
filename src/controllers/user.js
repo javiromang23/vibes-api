@@ -145,41 +145,43 @@ const userController = {
     }
 
     /* Avatar validation */
-    if (req.files.avatar != "" && req.files.avatar != undefined) {
-      let filePath = req.files.avatar.path;
-      let fileSplit = filePath.split("\\");
-      let fileName = fileSplit[fileSplit.length - 1];
-      let extSplit = fileName.split(".");
-      let fileExt = extSplit[1].toLowerCase();
-      fileName = extSplit[0];
+    if (req.files != undefined) {
+      if (req.files.avatar != "" && req.files.avatar != undefined) {
+        let filePath = req.files.avatar.path;
+        let fileSplit = filePath.split("\\");
+        let fileName = fileSplit[fileSplit.length - 1];
+        let extSplit = fileName.split(".");
+        let fileExt = extSplit[1].toLowerCase();
+        fileName = extSplit[0];
 
-      // Extensions file validation
-      if (
-        fileExt == "png" ||
-        fileExt == "jpg" ||
-        fileExt == "jpeg" ||
-        fileExt == "gif"
-      ) {
-        try {
-          let folder = path.resolve(
-            __dirname +
-              "/../../uploads/users/" +
-              req.params.username +
-              "/avatars/"
-          );
-          if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder, { recursive: true });
+        // Extensions file validation
+        if (
+          fileExt == "png" ||
+          fileExt == "jpg" ||
+          fileExt == "jpeg" ||
+          fileExt == "gif"
+        ) {
+          try {
+            let folder = path.resolve(
+              __dirname +
+                "/../../uploads/users/" +
+                req.params.username +
+                "/avatars/"
+            );
+            if (!fs.existsSync(folder)) {
+              fs.mkdirSync(folder, { recursive: true });
+            }
+            let newPathFile = path.resolve(folder + "/" + fileName);
+            fs.rename(filePath, newPathFile + "." + fileExt, err => {
+              if (err) throw err;
+            });
+            user.avatar = fileName + "." + fileExt;
+          } catch (err) {
+            return res.status(500).send({ message: `Error server: ${err}` });
           }
-          let newPathFile = path.resolve(folder + "/" + fileName);
-          fs.rename(filePath, newPathFile + "." + fileExt, err => {
-            if (err) throw err;
-          });
-          user.avatar = fileName + "." + fileExt;
-        } catch (err) {
-          return res.status(500).send({ message: `Error server: ${err}` });
+        } else {
+          return removeFilesUploads(res, filePath, "Image not valid.");
         }
-      } else {
-        return removeFilesUploads(res, filePath, "Image not valid.");
       }
     }
 
