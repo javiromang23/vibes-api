@@ -78,8 +78,8 @@ const followController = {
       }
 
       let followDeleted = await Follow.findOneAndDelete({
-        user: userFound.id,
-        followed: req.user
+        user: req.user,
+        followed: userFound.id
       });
       if (!followDeleted) {
         res.status(404).send({ message: "The request could not be accepted" });
