@@ -10,7 +10,39 @@ const userController = {
   test: (req, res) => {
     res.status(200).send({ message: "Testing userController..." });
   },
-  signUp: (req, res) => {
+  signUp: async (req, res) => {
+    /** Email validation */
+    if (req.body.email != "" && req.body.email != undefined) {
+      if (
+        /^((?!\.)[\w-_.]*[^.])(@\w+)(\.\w+(\.\w+)?[^.\W])$/.test(req.body.email)
+      ) {
+        try {
+          let userFound = await User.findOne({ email: req.body.email });
+          if (userFound) {
+            return res.status(400).send({ message: "Email is not available" });
+          }
+          user.email = req.body.email;
+        } catch (err) {
+          return res.status(500).send({ message: `Error server: ${err}` });
+        }
+      } else {
+        return res.status(400).send({ message: "Email not valid" });
+      }
+    }
+
+    /* Username validation */
+    if (req.body.username != "" && req.body.username != undefined) {
+      try {
+        let userFound = await User.findOne({ username: req.body.username });
+        if (userFound) {
+          return res.status(400).send({ message: "Username is not available" });
+        }
+        user.username = req.body.username;
+      } catch (err) {
+        return res.status(500).send({ message: `Error server: ${err}` });
+      }
+    }
+
     const newUser = new User({
       email: req.body.email,
       username: req.body.username,
@@ -73,7 +105,7 @@ const userController = {
           return res.status(500).send({ message: `Error server: ${err}` });
         }
       } else {
-        return res.status(400).send({ message: "Email is not available" });
+        return res.status(400).send({ message: "Email not valid" });
       }
     }
 
