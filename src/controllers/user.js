@@ -21,7 +21,6 @@ const userController = {
           if (userFound) {
             return res.status(400).send({ message: "Email is not available" });
           }
-          user.email = req.body.email;
         } catch (err) {
           return res.status(500).send({ message: `Error server: ${err}` });
         }
@@ -37,7 +36,6 @@ const userController = {
         if (userFound) {
           return res.status(400).send({ message: "Username is not available" });
         }
-        user.username = req.body.username;
       } catch (err) {
         return res.status(500).send({ message: `Error server: ${err}` });
       }
