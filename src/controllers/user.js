@@ -1,6 +1,7 @@
 "use strict";
 
 const User = require("../models/User");
+const Follow = require("../models/Follow");
 const serviceJwt = require("../services/jwt");
 const bcrypt = require("bcrypt-nodejs");
 const path = require("path");
@@ -93,12 +94,34 @@ const userController = {
       });
     });
   },
-  getUser: (req, res) => {
-    User.findOne({ username: req.params.username }, (err, user) => {
-      if (err) return res.status(500).send({ message: err });
-      if (!user) return res.status(404).send({ message: "User not found" });
-      return res.status(200).send({ message: "User sent", user: user });
-    }).select("-password");
+  getUser: async (req, res) => {
+    try {
+      let userFound = await User.findOne({
+        username: req.params.username
+      }).select("-password");
+      if (!userFound)
+        return res.status(404).send({ message: "User not found" });
+
+      if (userFound.typeAccount != "private") {
+        return res.status(200).send({ message: "User sent", user: userFound });
+      }
+
+      let follow = await Follow.findOne({
+        user: req.user,
+        followed: userFound.id,
+        toAccept: true
+      });
+      if (!follow) {
+        userFound.email = undefined;
+        userFound.sex = undefined;
+        userFound.website = undefined;
+        userFound.signUpDate = undefined;
+        userFound.lastLogin = undefined;
+      }
+      return res.status(200).send({ message: "User sent", user: userFound });
+    } catch (err) {
+      return res.status(500).send({ message: err });
+    }
   },
   updateUser: async (req, res) => {
     let user = {};
