@@ -9,6 +9,7 @@ const app = express();
 /* Route Files */
 const userRoutes = require("./routes/user");
 const followRoutes = require("./routes/follow");
+const publicationRoutes = require("./routes/publication");
 
 /** Middlewares **/
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -31,5 +32,6 @@ app.use((req, res, next) => {
 /** Routes **/
 app.use("/api", userRoutes);
 app.use("/api", followRoutes);
+app.use("/api", publicationRoutes);
 
 module.exports = app;
