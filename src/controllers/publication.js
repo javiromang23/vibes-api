@@ -1,6 +1,7 @@
 "use strict";
 
 const User = require("../models/User");
+const Follow = require("../models/Follow");
 const Publication = require("../models/Publication");
 const path = require("path");
 const fs = require("fs");
@@ -82,7 +83,120 @@ const publicationController = {
         .send({ message: "Missing arguments or are invalid" });
     }
   },
-  uploadPublication: (req, res) => {}
+  uploadPublication: (req, res) => {
+    let publication = {};
+
+    if (req.body.title != "" && req.body.title != undefined) {
+      publication.title = req.body.title;
+    }
+    if (req.body.description != "" && req.body.description != undefined) {
+      publication.description = req.body.description;
+    }
+
+    Publication.findOneAndUpdate(
+      { _id: req.params.id },
+      publication,
+      { new: true },
+      (err, publicationUpdated) => {
+        if (err)
+          return res.status(500).send({ message: `Error server: ${err}` });
+        if (!publicationUpdated) {
+          return res.status(404).send({ message: "Publication not found." });
+        }
+        return res.status(200).send({
+          message: "Updated publication",
+          publication: publicationUpdated
+        });
+      }
+    );
+  },
+  getPublication: async (req, res) => {
+    try {
+      let publicationFound = await Publication.findById({
+        _id: req.params.id
+      }).populate("user");
+      if (!publicationFound)
+        return res.status(404).send({ message: "Publication not found." });
+      publicationFound.user.password = undefined;
+      if (publicationFound.user.typeAccount == "private") {
+        let follow = Follow.findOne({
+          user: req.user,
+          followed: publicationFound.user.id,
+          accept: true
+        });
+        if (!follow)
+          return res
+            .status(401)
+            .send({ message: "This publication is private" });
+      }
+      return res.status(200).send({
+        message: "Publication found.",
+        publication: publicationFound
+      });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  },
+  getPublicationsByUser: async (req, res) => {
+    try {
+      let user = await User.findOne({ username: req.params.username });
+      if (!user) return res.status(404).send({ message: "User not found." });
+
+      if (user.id != req.user) {
+        if (user.typeAccount == "private") {
+          let follow = await Follow.findOne({
+            user: req.user,
+            followed: user.id,
+            accept: true
+          });
+          if (!follow)
+            return res
+              .status(401)
+              .send({ message: "This publications is private" });
+        }
+      }
+
+      let publications = await Publication.find({ user: user.id });
+      return res.status(200).send({
+        message: "Publications found.",
+        publications: publications
+      });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  },
+  deletePublication: async (req, res) => {
+    try {
+      let publication = await Publication.findById(req.params.id).populate(
+        "user"
+      );
+
+      if (publication.user.id == req.user) {
+        let deleted = await Publication.findByIdAndDelete({
+          _id: publication.id
+        });
+        if (!deleted)
+          return res.status(401).send({ message: "Error in the request." });
+
+        let pathFile = path.resolve(
+          __dirname +
+            "/../../uploads/users/" +
+            publication.user.username +
+            "/publications/" +
+            publication.image
+        );
+        fs.unlinkSync(pathFile);
+
+        return res.status(200).send({ message: "Deleted publication." });
+      } else {
+        return res.status(403).send({
+          message: "Forbidden: You don't have permission to access on this user"
+        });
+      }
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  }
 };
 
 module.exports = publicationController;
