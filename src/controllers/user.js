@@ -3,6 +3,7 @@
 const User = require("../models/User");
 const Follow = require("../models/Follow");
 const serviceJwt = require("../services/jwt");
+const parameters = require("../parameters");
 const bcrypt = require("bcrypt-nodejs");
 const path = require("path");
 const fs = require("fs");
@@ -25,6 +26,12 @@ const userController = {
       let regExp = /\s+/g;
       let email = req.body.email.replace(regExp, "");
       let username = req.body.username.replace(regExp, "");
+
+      for (let prop in parameters.reservedWords) {
+        if (username.toLowerCase() == prop) {
+          return res.status(400).send({ message: "Username is not available" });
+        }
+      }
 
       /** Email validation */
       if (
@@ -173,8 +180,8 @@ const userController = {
     /* TypeAccount validation */
     if (req.body.typeAccount != "" && req.body.typeAccount != undefined) {
       if (
-        req.body.typeAccount.toLowerCase() != "public" &&
-        req.body.typeAccount.toLowerCase() != "private"
+        req.body.typeAccount.toLowerCase() != parameters.typeAccount.public &&
+        req.body.typeAccount.toLowerCase() != parameters.typeAccount.private
       ) {
         return res.status(400).send({ message: "Invalid typeAccount" });
       } else {
@@ -203,10 +210,10 @@ const userController = {
     /* Sex validation */
     if (req.body.sex != "" && req.body.sex != undefined) {
       if (
-        req.body.sex.toLowerCase() != "male" &&
-        req.body.sex.toLowerCase() != "female" &&
-        req.body.sex.toLowerCase() != "shemale" &&
-        req.body.sex.toLowerCase() != "other"
+        req.body.sex.toLowerCase() != parameters.sex.male &&
+        req.body.sex.toLowerCase() != parameters.sex.female &&
+        req.body.sex.toLowerCase() != parameters.sex.shemale &&
+        req.body.sex.toLowerCase() != parameters.sex.other
       ) {
         return res.status(400).send({ message: "Invalid sex" });
       } else {

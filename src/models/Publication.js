@@ -10,7 +10,8 @@ const PublicationSchema = new Schema({
   user: { type: Schema.ObjectId, ref: "User", required: true },
   createdAt: { type: Date, default: Date.now() },
   /** Optional */
-  description: { type: String }
+  description: { type: String },
+  category: { type: String, required: false, default: "none" }
 });
 
 module.exports = mongoose.model("Publication", PublicationSchema);

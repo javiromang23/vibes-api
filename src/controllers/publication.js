@@ -3,6 +3,7 @@
 const User = require("../models/User");
 const Follow = require("../models/Follow");
 const Publication = require("../models/Publication");
+const parameters = require("../parameters");
 const path = require("path");
 const fs = require("fs");
 
@@ -25,6 +26,20 @@ const publicationController = {
     ) {
       publication.title = req.body.title;
       publication.description = req.body.description;
+
+      if (req.body.category != "" && req.body.category != undefined) {
+        let count = 0;
+        let errors = 0;
+        for (let prop in parameters.category) {
+          count++;
+          if (req.params.category.toLowerCase() != prop) {
+            errors++;
+          }
+        }
+        if (count == errors) {
+          return res.status(400).send({ message: "Category is not available" });
+        }
+      }
 
       let filePath = req.files.image.path;
       let fileSplit = filePath.split("\\");
@@ -227,11 +242,61 @@ const publicationController = {
       if (publications.length != 0) {
         return res
           .status(200)
-          .send({ message: "Publications found", publications: publications });
+          .send({ total: publications.length, publications: publications });
       }
       return res
         .status(404)
         .send({ message: "There are no existing publications" });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  },
+  getPublicationsPublic: async (req, res) => {
+    try {
+      let publications;
+
+      let usersPublic = await User.find({
+        typeAccount: "public"
+      }).select("id");
+
+      let usersFollow = await Follow.find({ user: req.user, toAccept: true })
+        .populate("followed")
+        .select("followed.id");
+
+      let users = usersPublic.concat(usersFollow);
+
+      if (req.params.category != "" && req.params.category != undefined) {
+        let count = 0;
+        let errors = 0;
+        for (let prop in parameters.category) {
+          count++;
+          if (req.params.category.toLowerCase() != prop) {
+            errors++;
+          }
+        }
+        if (count == errors) {
+          return res.status(400).send({ message: "Category is not available" });
+        }
+        publications = await Publication.find({
+          user: users,
+          category: req.params.category
+        })
+          .populate("user")
+          .sort("-createdAt");
+      } else {
+        publications = await Publication.find({
+          user: users
+        })
+          .populate("user")
+          .sort("-createdAt");
+      }
+
+      if (!publications)
+        return res.status(404).send({ message: "Publications not found" });
+
+      return res
+        .status(200)
+        .send({ total: publications.length, publications: publications });
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
