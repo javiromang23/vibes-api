@@ -10,6 +10,11 @@ api.post("/publication", auth, publicationController.savePublication);
 api.put("/publication/:id", auth, publicationController.uploadPublication);
 api.get("/publication/:id", auth, publicationController.getPublication);
 api.get(
+  "/publications/follows",
+  auth,
+  publicationController.getPublicationsFollowers
+);
+api.get(
   "/publications/:username",
   auth,
   publicationController.getPublicationsByUser

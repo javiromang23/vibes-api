@@ -196,6 +196,45 @@ const publicationController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  getPublicationsFollowers: async (req, res) => {
+    try {
+      let followers = [];
+      let publications = [];
+
+      let follows = await Follow.find({
+        user: req.user,
+        toAccept: true
+      }).populate("followed");
+
+      follows.forEach(follow => {
+        followers.push(follow.followed.id);
+      });
+
+      followers.push(req.user);
+
+      let publicationsFound = await Publication.find({
+        user: followers
+      })
+        .populate("user")
+        .sort("-createdAt");
+
+      publicationsFound.forEach(publication => {
+        publication.user.password = undefined;
+        publications.push(publication);
+      });
+
+      if (publications.length != 0) {
+        return res
+          .status(200)
+          .send({ message: "Publications found", publications: publications });
+      }
+      return res
+        .status(404)
+        .send({ message: "There are no existing publications" });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 
