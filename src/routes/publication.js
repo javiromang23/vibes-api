@@ -7,10 +7,10 @@ const api = express.Router();
 
 api.get("/test-publication", publicationController.test);
 api.post("/publication", auth, publicationController.savePublication);
-api.put("/publication/:id", auth, publicationController.uploadPublication);
+api.put("/publication/:id", auth, publicationController.updatePublication);
 api.get("/publication/:id", auth, publicationController.getPublication);
 api.get(
-  "/publications-follows",
+  "/publications/follows",
   auth,
   publicationController.getPublicationsFollowers
 );

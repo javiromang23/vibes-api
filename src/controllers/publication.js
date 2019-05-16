@@ -98,7 +98,7 @@ const publicationController = {
         .send({ message: "Missing arguments or are invalid" });
     }
   },
-  uploadPublication: (req, res) => {
+  updatePublication: (req, res) => {
     let publication = {};
 
     if (req.body.title != "" && req.body.title != undefined) {
@@ -106,6 +106,20 @@ const publicationController = {
     }
     if (req.body.description != "" && req.body.description != undefined) {
       publication.description = req.body.description;
+    }
+
+    if (req.body.category != "" && req.body.category != undefined) {
+      let count = 0;
+      let errors = 0;
+      for (let prop in parameters.category) {
+        count++;
+        if (req.body.category.toLowerCase() != prop) {
+          errors++;
+        }
+      }
+      if (count == errors) {
+        return res.status(400).send({ message: "Category is not available" });
+      }
     }
 
     Publication.findOneAndUpdate(
