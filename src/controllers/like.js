@@ -1,6 +1,5 @@
 "use strict";
 
-const User = require("../models/User");
 const Follow = require("../models/Follow");
 const Publication = require("../models/Publication");
 const Like = require("../models/like");
