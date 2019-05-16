@@ -32,7 +32,7 @@ const publicationController = {
         let errors = 0;
         for (let prop in parameters.category) {
           count++;
-          if (req.params.category.toLowerCase() != prop) {
+          if (req.body.category.toLowerCase() != prop) {
             errors++;
           }
         }
