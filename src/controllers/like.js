@@ -92,6 +92,45 @@ const publicationController = {
         .status(400)
         .send({ message: "Missing arguments or are invalid" });
     }
+  },
+  getLikeByPublication: async (req, res) => {
+    if (req.params.publication != "" && req.params.publication != undefined) {
+      try {
+        let publication = await Publication.findById(
+          req.params.publication
+        ).populate("user");
+        if (!publication)
+          return res.status(404).send({ message: "Publication not found" });
+
+        if (publication.user.typeAccount != parameters.typeAccount.public) {
+          let follow = await Follow.findOne({
+            user: req.user,
+            followed: publication.user.id,
+            toAccept: true
+          });
+          if (!follow)
+            return res.status(403).send({
+              message:
+                "Forbidden: You don't have permission to access on this user"
+            });
+        }
+
+        let likeFound = await Like.findOne({
+          user: req.user,
+          publication: req.params.publication
+        });
+        if (!likeFound)
+          return res.status(404).send({ message: "Like not found" });
+
+        return res.status(200).send({ message: "Like found", like: likeFound });
+      } catch (err) {
+        return res.status(500).send({ message: `Error server: ${err}` });
+      }
+    } else {
+      return res
+        .status(400)
+        .send({ message: "Missing arguments or are invalid" });
+    }
   }
 };
 
