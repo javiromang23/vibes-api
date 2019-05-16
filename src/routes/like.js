@@ -9,5 +9,6 @@ api.get("/test-like", likeController.test);
 api.post("/like/:publication", auth, likeController.saveLike);
 api.delete("/like/:publication", auth, likeController.deleteLike);
 api.get("/like/:publication", auth, likeController.getLikeByPublication);
+api.get("/likes/:publication", auth, likeController.getLikesByPublication);
 
 module.exports = api;
