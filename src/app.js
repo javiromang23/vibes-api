@@ -12,6 +12,7 @@ const followRoutes = require("./routes/follow");
 const publicationRoutes = require("./routes/publication");
 const likeRoutes = require("./routes/like");
 const commentRoutes = require("./routes/comment");
+const notificationRoutes = require("./routes/notification");
 
 /** Middlewares **/
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -37,5 +38,6 @@ app.use("/api", followRoutes);
 app.use("/api", publicationRoutes);
 app.use("/api", likeRoutes);
 app.use("/api", commentRoutes);
+app.use("/api", notificationRoutes);
 
 module.exports = app;
