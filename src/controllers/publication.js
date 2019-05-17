@@ -109,57 +109,58 @@ const publicationController = {
         .send({ message: "Missing arguments or are invalid" });
     }
   },
-  updatePublication: (req, res) => {
-    let publication = new Publication();
+  updatePublication: async (req, res) => {
+    try {
+      let publication = new Publication();
 
-    if (req.body.title != "" && req.body.title != undefined) {
-      publication.title = req.body.title;
-    }
-    if (req.body.description != "" && req.body.description != undefined) {
-      publication.description = req.body.description;
-    }
+      if (req.body.title != "" && req.body.title != undefined) {
+        publication.title = req.body.title;
+      }
+      if (req.body.description != "" && req.body.description != undefined) {
+        publication.description = req.body.description;
+      }
 
-    if (req.body.mentions != "" && req.body.mentions != undefined) {
-      let mentionsArray = req.body.mentions.split(";");
-      let mentions = await User.find({ _id: mentionsArray });
-      if (!mentions)
-        return res
-          .status(404)
-          .send({ message: "The mentioned users do not exist" });
+      if (req.body.mentions != "" && req.body.mentions != undefined) {
+        let mentionsArray = req.body.mentions.split(";");
+        let mentions = await User.find({ _id: mentionsArray });
+        if (!mentions)
+          return res
+            .status(404)
+            .send({ message: "The mentioned users do not exist" });
 
-      publication.mentions = mentions;
-    }
+        publication.mentions = mentions;
+      }
 
-    if (req.body.category != "" && req.body.category != undefined) {
-      let count = 0;
-      let errors = 0;
-      for (let prop in parameters.category) {
-        count++;
-        if (req.body.category.toLowerCase() != prop) {
-          errors++;
+      if (req.body.category != "" && req.body.category != undefined) {
+        let count = 0;
+        let errors = 0;
+        for (let prop in parameters.category) {
+          count++;
+          if (req.body.category.toLowerCase() != prop) {
+            errors++;
+          }
+        }
+        if (count == errors) {
+          return res.status(400).send({ message: "Category is not available" });
         }
       }
-      if (count == errors) {
-        return res.status(400).send({ message: "Category is not available" });
-      }
-    }
 
-    Publication.findOneAndUpdate(
-      { _id: req.params.id },
-      publication,
-      { new: true },
-      (err, publicationUpdated) => {
-        if (err)
-          return res.status(500).send({ message: `Error server: ${err}` });
-        if (!publicationUpdated) {
-          return res.status(404).send({ message: "Publication not found." });
-        }
-        return res.status(200).send({
-          message: "Updated publication",
-          publication: publicationUpdated
-        });
+      let publicationUpdated = await Publication.findOneAndUpdate(
+        { _id: req.params.id },
+        publication,
+        { new: true }
+      );
+      if (!publicationUpdated) {
+        return res.status(404).send({ message: "Publication not found." });
       }
-    );
+
+      return res.status(200).send({
+        message: "Updated publication",
+        publication: publicationUpdated
+      });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   },
   getPublication: async (req, res) => {
     try {
