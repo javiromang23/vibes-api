@@ -41,6 +41,17 @@ const publicationController = {
         }
       }
 
+      if (req.body.mentions != "" && req.body.mentions != undefined) {
+        let mentionsArray = req.body.mentions.split(";");
+        let mentions = await User.find({ _id: mentionsArray });
+        if (!mentions)
+          return res
+            .status(404)
+            .send({ message: "The mentioned users do not exist" });
+
+        publication.mentions = mentions;
+      }
+
       let filePath = req.files.image.path;
       let fileSplit = filePath.split("\\");
       let fileName = fileSplit[fileSplit.length - 1];
@@ -99,13 +110,24 @@ const publicationController = {
     }
   },
   updatePublication: (req, res) => {
-    let publication = {};
+    let publication = new Publication();
 
     if (req.body.title != "" && req.body.title != undefined) {
       publication.title = req.body.title;
     }
     if (req.body.description != "" && req.body.description != undefined) {
       publication.description = req.body.description;
+    }
+
+    if (req.body.mentions != "" && req.body.mentions != undefined) {
+      let mentionsArray = req.body.mentions.split(";");
+      let mentions = await User.find({ _id: mentionsArray });
+      if (!mentions)
+        return res
+          .status(404)
+          .send({ message: "The mentioned users do not exist" });
+
+      publication.mentions = mentions;
     }
 
     if (req.body.category != "" && req.body.category != undefined) {

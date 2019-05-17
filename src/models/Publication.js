@@ -11,7 +11,8 @@ const PublicationSchema = new Schema({
   createdAt: { type: Date, default: Date.now() },
   /** Optional */
   description: { type: String },
-  category: { type: String, required: false, default: "none" }
+  category: { type: String, required: false, default: "none" },
+  mentions: { type: [Schema.ObjectId], ref: "User" }
 });
 
 module.exports = mongoose.model("Publication", PublicationSchema);
