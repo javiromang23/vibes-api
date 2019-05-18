@@ -72,7 +72,12 @@ const userController = {
             .status(500)
             .send({ message: `Error creating the user: ${err}` });
 
-        return res.status(201).send({ token: serviceJwt.createToken(newUser) });
+        return res
+          .status(201)
+          .send({
+            token: serviceJwt.createToken(newUser),
+            username: user.username
+          });
       });
     } else {
       return res
@@ -96,7 +101,8 @@ const userController = {
 
         res.status(200).send({
           message: "Correct login",
-          token: serviceJwt.createToken(user)
+          token: serviceJwt.createToken(user),
+          username: user.username
         });
       });
     });
