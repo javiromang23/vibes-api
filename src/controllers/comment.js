@@ -46,9 +46,13 @@ const commentController = {
             message: "Error in the request."
           });
 
+        let commentPopulate = await commentStored
+          .populate("user")
+          .execPopulate();
+
         return res
           .status(200)
-          .send({ message: "Comment stored", comment: commentStored });
+          .send({ message: "Comment stored", comment: commentPopulate });
       } catch (err) {
         return res.status(500).send({ message: `Error server: ${err}` });
       }
@@ -176,7 +180,7 @@ const commentController = {
 
         let commentsFound = await Comment.find({
           publication: req.params.publication
-        });
+        }).populate("user");
         if (!commentsFound)
           return res.status(404).send({
             message: "Error in the request."

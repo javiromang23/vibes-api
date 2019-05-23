@@ -31,6 +31,16 @@ const publicationController = {
             });
         }
 
+        let likeFound = await Like.findOne({
+          user: req.user,
+          publication: req.params.publication
+        });
+
+        if (likeFound)
+          return res.status(400).send({
+            message: "Publication is liked"
+          });
+
         let like = new Like();
         like.user = req.user;
         like.publication = publication.id;
