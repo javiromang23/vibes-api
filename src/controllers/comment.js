@@ -188,7 +188,7 @@ const commentController = {
 
         return res
           .status(200)
-          .send({ message: "Comments found", comments: commentsFound });
+          .send({ total: commentsFound.length, comments: commentsFound });
       } catch (err) {
         return res.status(500).send({ message: `Error server: ${err}` });
       }

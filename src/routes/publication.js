@@ -25,10 +25,6 @@ api.get(
   publicationController.getPublicationsByUser
 );
 api.delete("/publication/:id", auth, publicationController.deletePublication);
-api.get(
-  "/publication/:username/:image",
-  auth,
-  publicationController.getImageFile
-);
+api.get("/publication/:username/:image", publicationController.getImageFile);
 
 module.exports = api;

@@ -208,9 +208,11 @@ const publicationController = {
         }
       }
 
-      let publications = await Publication.find({ user: user.id });
+      let publications = await Publication.find({ user: user.id }).populate(
+        "user"
+      );
       return res.status(200).send({
-        message: "Publications found.",
+        total: publications.length,
         publications: publications
       });
     } catch (err) {

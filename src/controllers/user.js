@@ -59,6 +59,26 @@ const userController = {
         return res.status(500).send({ message: `Error server: ${err}` });
       }
 
+      try {
+        let fileDefault = path.resolve(
+          __dirname + "/../../uploads/default/default_profile.png"
+        );
+        let folderNew = path.resolve(
+          __dirname + "/../../uploads/users/" + username + "/avatars/"
+        );
+        if (!fs.existsSync(folderNew)) {
+          fs.mkdirSync(folderNew, { recursive: true });
+        }
+        let newPathFile = path.resolve(folderNew + "/default_profile.png");
+
+        fs.copyFile(fileDefault, newPathFile, err => {
+          if (err) throw err;
+          console.log("source.txt was copied to destination.txt");
+        });
+      } catch (err) {
+        return res.status(500).send({ message: `Error server: ${err}` });
+      }
+
       const newUser = new User({
         email: email,
         username: username,
@@ -72,12 +92,10 @@ const userController = {
             .status(500)
             .send({ message: `Error creating the user: ${err}` });
 
-        return res
-          .status(201)
-          .send({
-            token: serviceJwt.createToken(newUser),
-            username: user.username
-          });
+        return res.status(201).send({
+          token: serviceJwt.createToken(newUser),
+          userId: newUser.id
+        });
       });
     } else {
       return res
@@ -102,15 +120,44 @@ const userController = {
         res.status(200).send({
           message: "Correct login",
           token: serviceJwt.createToken(user),
-          username: user.username
+          userId: user.id
         });
       });
     });
   },
-  getUser: async (req, res) => {
+  getUserByUsername: async (req, res) => {
     try {
       let userFound = await User.findOne({
         username: req.params.username
+      }).select("-password");
+      if (!userFound)
+        return res.status(404).send({ message: "User not found" });
+
+      if (userFound.typeAccount != "private") {
+        return res.status(200).send({ message: "User sent", user: userFound });
+      }
+
+      let follow = await Follow.findOne({
+        user: req.user,
+        followed: userFound.id,
+        toAccept: true
+      });
+      if (!follow) {
+        userFound.email = undefined;
+        userFound.sex = undefined;
+        userFound.website = undefined;
+        userFound.signUpDate = undefined;
+        userFound.lastLogin = undefined;
+      }
+      return res.status(200).send({ message: "User sent", user: userFound });
+    } catch (err) {
+      return res.status(500).send({ message: err });
+    }
+  },
+  getUserById: async (req, res) => {
+    try {
+      let userFound = await User.findOne({
+        _id: req.params.id
       }).select("-password");
       if (!userFound)
         return res.status(404).send({ message: "User not found" });

@@ -88,6 +88,44 @@ const followController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  getFolloweds: async (req, res) => {
+    try {
+      let userFound = await User.findOne({ username: req.params.username });
+      if (!userFound) {
+        res.status(404).send({ message: "User not found" });
+      }
+
+      let follows = await Follow.find({
+        user: userFound.id,
+        toAccept: true
+      });
+      if (!follows) {
+        res.status(404).send({ message: "The request could not be accepted" });
+      }
+      return res.status(200).send({ total: follows.length, follows: follows });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  },
+  getFollowers: async (req, res) => {
+    try {
+      let userFound = await User.findOne({ username: req.params.username });
+      if (!userFound) {
+        res.status(404).send({ message: "User not found" });
+      }
+
+      let follows = await Follow.find({
+        followed: userFound.id,
+        toAccept: true
+      });
+      if (!follows) {
+        res.status(404).send({ message: "The request could not be accepted" });
+      }
+      return res.status(200).send({ total: follows.length, follows: follows });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 

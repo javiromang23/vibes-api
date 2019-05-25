@@ -7,8 +7,9 @@ const permissions = require("../middlewares/permissions");
 const api = express.Router();
 
 api.get("/test-user", userController.test);
-api.get("/user/:username", auth, userController.getUser);
-api.get("/user/:username/:imageFile", auth, userController.getImageFile);
+api.get("/userById/:id", auth, userController.getUserById);
+api.get("/user/:username", auth, userController.getUserByUsername);
+api.get("/user/:username/:imageFile", userController.getImageFile);
 api.put(
   "/user/:username",
   [auth, permissions.permissionsValidation],
