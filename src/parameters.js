@@ -6,8 +6,7 @@ module.exports = {
   sex: {
     male: "male",
     female: "female",
-    shemale: "shemale",
-    other: "other"
+    unspecified: "unspecified"
   },
   category: {
     peoplevibes: "peoplevibes",

@@ -22,7 +22,7 @@ const UserSchema = new Schema({
   lastLogin: Date,
   website: String,
   bio: String,
-  sex: { type: String, lowercase: true }
+  sex: { type: String, lowercase: true, default: "unspecified" }
 });
 
 UserSchema.pre("save", function(next) {

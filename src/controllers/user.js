@@ -194,7 +194,7 @@ const userController = {
       ) {
         try {
           let userFound = await User.findOne({ email: req.body.email });
-          if (userFound) {
+          if (userFound && userFound.id != req.user) {
             return res.status(400).send({ message: "Email is not available" });
           }
           user.email = req.body.email;
@@ -211,7 +211,7 @@ const userController = {
       var username = req.body.username.replace(regExp, "");
       try {
         let userFound = await User.findOne({ username: username });
-        if (userFound) {
+        if (userFound && userFound.id != req.user) {
           return res.status(400).send({ message: "Username is not available" });
         }
         user.username = username;
