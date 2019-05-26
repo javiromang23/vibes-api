@@ -2,6 +2,9 @@
 
 const User = require("../models/User");
 const Follow = require("../models/Follow");
+const Publication = require("../models/Publication");
+const Comment = require("../models/Comment");
+const Like = require("../models/like");
 const serviceJwt = require("../services/jwt");
 const parameters = require("../parameters");
 const bcrypt = require("bcrypt-nodejs");
@@ -73,7 +76,7 @@ const userController = {
 
         fs.copyFile(fileDefault, newPathFile, err => {
           if (err) throw err;
-          console.log("source.txt was copied to destination.txt");
+          console.log("default_profile.png was copied to userFolder");
         });
       } catch (err) {
         return res.status(500).send({ message: `Error server: ${err}` });
@@ -333,7 +336,6 @@ const userController = {
   deleteUser: async (req, res) => {
     try {
       let userDeleted = await User.deleteOne({ username: req.params.username });
-      console.log(userDeleted);
       if (!userDeleted)
         return res.status(404).send({ message: `User not found` });
 
@@ -341,6 +343,22 @@ const userController = {
         __dirname + "/../../uploads/users/" + req.params.username
       );
       deleteFolderRecursive(folder);
+
+      let followers = await Follow.find({ user: req.user })
+        .remove()
+        .exec();
+      let followeds = await Follow.find({ followed: req.user })
+        .remove()
+        .exec();
+      let publications = await Publication.find({ user: req.user })
+        .remove()
+        .exec();
+      let comments = await Comment.find({ user: req.user })
+        .remove()
+        .exec();
+      let likes = await Like.find({ user: req.user })
+        .remove()
+        .exec();
 
       return res.status(200).send({ message: `User deleted` });
     } catch (err) {

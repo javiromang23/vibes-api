@@ -16,15 +16,12 @@ const publicationController = {
     publication.user = req.user;
 
     if (
-      req.body.title != "" &&
-      req.body.title != undefined &&
       req.body.description != "" &&
       req.body.description != undefined &&
       req.files != undefined &&
       req.files.image != "" &&
       req.files.image != undefined
     ) {
-      publication.title = req.body.title;
       publication.description = req.body.description;
 
       if (req.body.category != "" && req.body.category != undefined) {
@@ -113,9 +110,6 @@ const publicationController = {
     try {
       let publication = new Publication();
 
-      if (req.body.title != "" && req.body.title != undefined) {
-        publication.title = req.body.title;
-      }
       if (req.body.description != "" && req.body.description != undefined) {
         publication.description = req.body.description;
       }
