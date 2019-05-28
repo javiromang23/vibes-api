@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vibes</title>
+</head>
+<body>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Pacifico&display=swap');
+    </style>
+    <div style="width: 50%; margin: auto; text-align: center;">
+        <div style="font-family: 'Pacifico', cursive">
+            Vibes
+        </div>
+        <div style="font-size: 14px">
+            <h4><b>Te damos la bienvenida a Vibes, {{user.username}}</b></h4>
+            <p>
+                Nos alegra mucho que hayas participado en el proyecto Vibes,
+                empieza a compartir fotos de experiencias con tus amigos.
+                Al seguir a alguien verás las fotos que publique. Cuantas
+                más gente sigas, más contenido interesante verás en tu sección
+                de noticias. Sigue a tus amigos o personas con tu mismo interés.
+            </p>
+            <p>
+                Te mantendremos informado de todas las mejoras que haya Vibes.
+                Podrás disfrutar de una mejor experiencia de usuario y siempre
+                manteniendo tu información a salvo. No utilizamos tus datos con
+                ningún fin específico. Podrás consultar todas las politicas y
+                preguntas a través de Vibes en la sección <b>politicas de seguridad</b>
+                y <b>preguntas frecuentes</b>.
+            </p>
+            <p>
+                Un saludo, <br>
+                Vibes Team.
+            </p>
+            <small style="margin-top: 2em">
+                Este mensaje se ha enviado a la dirección {{user.email}}, pero iba dirigido a {{user.username}}.
+                Vibes te envía actualizaciones como esta para ayudarte a estar al día de las últimas novedades de Vibes. 
+                Puedes eliminar este correo electrónico si esta no es tu cuenta de Vibes.
+            </small>
+        </div>
+    </div>
+</body>
+</html>
