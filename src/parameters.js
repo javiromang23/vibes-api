@@ -20,5 +20,9 @@ module.exports = {
     follow: "follow",
     public: "public",
     private: "private"
+  },
+  mailer: {
+    user: "no-reply.vibes@hotmail.com",
+    password: "b4Hrr6R7QFMn2pm"
   }
 };

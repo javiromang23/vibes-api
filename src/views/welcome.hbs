@@ -5,26 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Vibes</title>
+    <style>
+        @font-face {
+            font-family: 'Pacifico';
+            font-style: normal;
+            font-weight: 400;
+            src: local('Pacifico Regular'), local('Pacifico-Regular'), url(https://fonts.gstatic.com/s/pacifico/v13/FwZY7-Qmy14u9lezJ-6H6Mk.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .logo {
+            font-family: 'Pacifico', cursive;
+            font-size: 28px;
+        }
+    </style>
 </head>
 <body>
-    <style>
-        @import url('https://fonts.googleapis.com/css?family=Pacifico&display=swap');
-    </style>
-    <div style="width: 50%; margin: auto; text-align: center;">
-        <div style="font-family: 'Pacifico', cursive">
+    <div style="width: 75%; margin: auto; text-align:center">
+        <div class="logo">
             Vibes
         </div>
         <div style="font-size: 14px">
-            <h4><b>Te damos la bienvenida a Vibes, {{user.username}}</b></h4>
+            <h3><b>Te damos la bienvenida a Vibes, {{username}}</b></h3>
             <p>
-                Nos alegra mucho que hayas participado en el proyecto Vibes,
-                empieza a compartir fotos de experiencias con tus amigos.
+                Nos alegra mucho que hayas participado en el proyecto Vibes.
+                ¡Ya puedes empezar a compartir fotos de experiencias con tus amigos!
+            </p>
+            </p>
                 Al seguir a alguien verás las fotos que publique. Cuantas
                 más gente sigas, más contenido interesante verás en tu sección
                 de noticias. Sigue a tus amigos o personas con tu mismo interés.
             </p>
             <p>
-                Te mantendremos informado de todas las mejoras que haya Vibes.
+                Te mantendremos informado de todas las mejoras que haya en Vibes.
                 Podrás disfrutar de una mejor experiencia de usuario y siempre
                 manteniendo tu información a salvo. No utilizamos tus datos con
                 ningún fin específico. Podrás consultar todas las politicas y
@@ -33,10 +48,10 @@
             </p>
             <p>
                 Un saludo, <br>
-                Vibes Team.
+                Vibes Company.
             </p>
-            <small style="margin-top: 2em">
-                Este mensaje se ha enviado a la dirección {{user.email}}, pero iba dirigido a {{user.username}}.
+            <small style="margin-top: 2em; font-size: 9px; color: rgb(206, 206, 206);">
+                Este mensaje se ha enviado a la dirección {{email}}, pero iba dirigido a <b>{{username}}</b>.
                 Vibes te envía actualizaciones como esta para ayudarte a estar al día de las últimas novedades de Vibes. 
                 Puedes eliminar este correo electrónico si esta no es tu cuenta de Vibes.
             </small>

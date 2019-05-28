@@ -10,6 +10,7 @@ const parameters = require("../parameters");
 const bcrypt = require("bcrypt-nodejs");
 const path = require("path");
 const fs = require("fs");
+const mailer = require("../services/mailer");
 
 const userController = {
   test: (req, res) => {
@@ -95,7 +96,9 @@ const userController = {
             .status(500)
             .send({ message: `Error creating the user: ${err}` });
 
-        return res.status(201).send({
+        mailer.sendWelcomeEmail(newUser.email, newUser.username);
+
+        return res.status(200).send({
           token: serviceJwt.createToken(newUser),
           userId: newUser.id
         });
