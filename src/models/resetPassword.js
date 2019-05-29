@@ -7,7 +7,8 @@ const ResetPasswordSchema = new Schema({
   user: { type: Schema.ObjectId, ref: "User", required: true },
   hash: { type: String, required: true },
   toDate: { type: Date, default: Date.now() },
-  toExpired: { type: Date, default: Date.now() + 900000 }
+  toExpired: { type: Date, default: Date.now() + 900000 },
+  timeOut: { type: Boolean, default: false }
 });
 
 module.exports = mongoose.model("ResetPassword", ResetPasswordSchema);

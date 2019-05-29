@@ -411,9 +411,9 @@ const userController = {
 
       let resetPasswordFound = await ResetPassword.findOne({
         user: user,
-        hash: hash
+        timeOut: false
       });
-      if (!resetPasswordFound) {
+      if (resetPasswordFound && resetPasswordFound.toExpired > Date.now()) {
         return res.status(200).send({
           message:
             "Check your email, we have sent a link for the password change"
@@ -422,10 +422,7 @@ const userController = {
 
       let newResetPassword = await ResetPassword.create(resetPassword);
       if (!newResetPassword) {
-        return res.status(200).send({
-          message:
-            "Check your email, we have sent a link for the password change"
-        });
+        return res.status(500).send({ message: `Error server: ${err}` });
       }
 
       mailer.sendResetPassword(user.email, hash, user.username);
@@ -437,7 +434,45 @@ const userController = {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
   },
-  resetPasswordByEmail: async (req, res) => {}
+  resetPasswordByEmail: async (req, res) => {
+    try {
+      let resetPasswordFound = await ResetPassword.findOne({
+        hash: req.params.hash,
+        timeOut: false
+      }).populate("user");
+      if (!resetPasswordFound || resetPasswordFound.toExpired < Date.now()) {
+        return res.status(403).send({
+          message: "Forbidden: You don't have permission to access"
+        });
+      }
+
+      let userUpdated = await User.findByIdAndUpdate(
+        { _id: resetPasswordFound.user.id },
+        { password: req.body.password },
+        { new: true }
+      ).select("-password");
+
+      if (!userUpdated)
+        return res.status(404).send({
+          message: "User not found"
+        });
+
+      let resetPassword = await ResetPassword.findByIdAndUpdate(
+        { _id: resetPasswordFound.id },
+        {
+          timeOut: true
+        },
+        { new: true }
+      );
+
+      if (!resetPassword)
+        return res.status(500).send({ message: `Error server: ${err}` });
+
+      return res.status(200).send({ user: userUpdated });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
+  }
 };
 
 module.exports = userController;
