@@ -392,7 +392,7 @@ const userController = {
       let user = await User.findOne({ email: req.body.email });
       if (!user) {
         // Se envia siempre respuesta 200 por seguridad
-        res.status(200).send({
+        return res.status(200).send({
           message:
             "Check your email, we have sent a link for the password change"
         });
@@ -409,9 +409,20 @@ const userController = {
         hash: hash
       };
 
+      let resetPasswordFound = await ResetPassword.findOne({
+        user: user,
+        hash: hash
+      });
+      if (!resetPasswordFound) {
+        return res.status(200).send({
+          message:
+            "Check your email, we have sent a link for the password change"
+        });
+      }
+
       let newResetPassword = await ResetPassword.create(resetPassword);
       if (!newResetPassword) {
-        res.status(200).send({
+        return res.status(200).send({
           message:
             "Check your email, we have sent a link for the password change"
         });
@@ -419,13 +430,14 @@ const userController = {
 
       mailer.sendResetPassword(user.email, hash, user.username);
 
-      res.status(200).send({
+      return res.status(200).send({
         message: "Check your email, we have sent a link for the password change"
       });
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
-  }
+  },
+  resetPasswordByEmail: async (req, res) => {}
 };
 
 module.exports = userController;
