@@ -11,6 +11,8 @@ const bcrypt = require("bcrypt-nodejs");
 const path = require("path");
 const fs = require("fs");
 const mailer = require("../services/mailer");
+const crypto = require("crypto");
+const ResetPassword = require("../models/resetPassword");
 
 const userController = {
   test: (req, res) => {
@@ -384,6 +386,45 @@ const userController = {
         res.status(200).send({ message: "No existe la imagen" });
       }
     });
+  },
+  sendResetPassword: async (req, res) => {
+    try {
+      let user = await User.findOne({ email: req.body.email });
+      if (!user) {
+        // Se envia siempre respuesta 200 por seguridad
+        res.status(200).send({
+          message:
+            "Check your email, we have sent a link for the password change"
+        });
+      }
+      let current_date = new Date().valueOf().toString();
+      let random = Math.random().toString();
+      let hash = crypto
+        .createHash("sha1")
+        .update(current_date + random)
+        .digest("hex");
+
+      let resetPassword = {
+        user: user,
+        hash: hash
+      };
+
+      let newResetPassword = await ResetPassword.create(resetPassword);
+      if (!newResetPassword) {
+        res.status(200).send({
+          message:
+            "Check your email, we have sent a link for the password change"
+        });
+      }
+
+      mailer.sendResetPassword(user.email, hash, user.username);
+
+      res.status(200).send({
+        message: "Check your email, we have sent a link for the password change"
+      });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 
