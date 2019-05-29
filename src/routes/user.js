@@ -18,7 +18,12 @@ api.put(
 api.post("/signin", userController.signIn);
 api.post("/signup", userController.signUp);
 api.post("/resetPassword", userController.sendResetPassword);
-api.post("/resetPassword/:hash", userController.resetPasswordByEmail);
+api.post(
+  "/resetPassword/:username",
+  [auth, permissions.permissionsValidation],
+  userController.resetPassword
+);
+api.post("/resetPasswordByEmail/:hash", userController.resetPasswordByEmail);
 api.delete(
   "/user/:username",
   [auth, permissions.permissionsValidation],

@@ -472,6 +472,37 @@ const userController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  resetPassword: async (req, res) => {
+    try {
+      let user = await User.findOne({ _id: req.user });
+      if (!user)
+        return res
+          .status(404)
+          .send({ message: "Incorrect username or password" });
+
+      bcrypt.compare(req.body.oldPassword, user.password, (err, check) => {
+        if (!check)
+          return res
+            .status(404)
+            .send({ message: "Incorrect username or password" });
+
+        User.findOneAndUpdate(
+          { username: req.params.username },
+          { password: req.body.newPassword },
+          { new: true },
+          (err, userUpdated) => {
+            if (!userUpdated)
+              return res.status(404).send({
+                message: "User not found"
+              });
+            return res.status(200).send({ user: userUpdated });
+          }
+        ).select("-password");
+      });
+    } catch (err) {
+      return res.status(500).send({ message: `Error server: ${err}` });
+    }
   }
 };
 
