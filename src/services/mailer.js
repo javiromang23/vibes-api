@@ -66,7 +66,7 @@ module.exports = {
     let mailOptions = {
       from: parameters.mailer.user,
       to: email,
-      subject: "Recuperación de contraseña",
+      subject: "Restablecer contraseña",
       template: "resetPassword",
       context: {
         hash: hash,
