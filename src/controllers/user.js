@@ -413,7 +413,10 @@ const userController = {
         user: user,
         timeOut: false
       });
-      if (resetPasswordFound && resetPasswordFound.toExpired > Date.now()) {
+      if (
+        resetPasswordFound &&
+        !(resetPasswordFound.toExpired.getDate() > Date.now())
+      ) {
         return res.status(200).send({
           message:
             "Check your email, we have sent a link for the password change"
@@ -440,7 +443,10 @@ const userController = {
         hash: req.params.hash,
         timeOut: false
       }).populate("user");
-      if (!resetPasswordFound || resetPasswordFound.toExpired < Date.now()) {
+      if (
+        !resetPasswordFound ||
+        !(resetPasswordFound.toExpired.getTime() < Date.now())
+      ) {
         return res.status(403).send({
           message: "Forbidden: You don't have permission to access"
         });
@@ -503,6 +509,18 @@ const userController = {
     } catch (err) {
       return res.status(500).send({ message: `Error server: ${err}` });
     }
+  },
+  checkTokenReset: (req, res) => {
+    ResetPassword.findOne(
+      { hash: req.params.hash, timeOut: false },
+      (err, resetPassword) => {
+        if (err)
+          return res.status(500).send({ message: `Error server: ${err}` });
+        if (!resetPassword)
+          return res.status(404).send({ message: "Request not found" });
+        return res.status(200).send({ message: "Request found" });
+      }
+    );
   }
 };
 
