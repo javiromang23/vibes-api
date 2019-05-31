@@ -39,6 +39,7 @@ const commentController = {
         comment.publication = req.params.publication;
         comment.user = req.user;
         comment.text = req.body.text;
+        comment.toDate = Date.now();
 
         let commentStored = await Comment.create(comment);
         if (!commentStored)

@@ -18,6 +18,7 @@ const notificationController = {
       let notification = new Notification();
       notification.html = req.body.html;
       notification.user = req.params.user;
+      notification.toDate = Date.now();
 
       Notification.create(notification, (err, notificationStored) => {
         if (err)

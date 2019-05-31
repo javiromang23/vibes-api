@@ -82,6 +82,7 @@ const publicationController = {
             if (err) throw err;
           });
           publication.image = fileName + "." + fileExt;
+          publication.createdAt = Date.now();
 
           let newPublication = await Publication.create(publication);
           if (!newPublication) {

@@ -89,7 +89,8 @@ const userController = {
         email: email,
         username: username,
         password: req.body.password,
-        name: req.body.name
+        name: req.body.name,
+        signUpDate: Date.now()
       });
 
       newUser.save(err => {
