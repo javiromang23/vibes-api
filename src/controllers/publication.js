@@ -36,6 +36,7 @@ const publicationController = {
         if (count == errors) {
           return res.status(400).send({ message: "Category is not available" });
         }
+        publication.category = req.body.category.toLowerCase();
       }
 
       if (req.body.mentions != "" && req.body.mentions != undefined) {
@@ -315,7 +316,7 @@ const publicationController = {
         }
         publications = await Publication.find({
           user: users,
-          category: req.params.category
+          category: req.params.category.toLowerCase()
         })
           .populate("user")
           .sort("-createdAt");
