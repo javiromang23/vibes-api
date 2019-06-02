@@ -18,8 +18,8 @@ const notificationController = {
       req.body.fromUser != ""
     ) {
       let notification = new Notification();
-      notification.message = req.body.html;
-      notification.user = req.params.user;
+      notification.message = req.body.message;
+      notification.user = req.body.user;
       notification.toDate = Date.now();
       notification.fromUser = req.body.fromUser;
 
@@ -53,6 +53,11 @@ const notificationController = {
         return res
           .status(401)
           .send({ message: `The notification could not be saved.` });
+
+      notifications.map(notification => {
+        notification.fromUser.password = undefined;
+        notification.user.password = undefined;
+      });
 
       return res.status(200).send({
         message: "Notications found.",
