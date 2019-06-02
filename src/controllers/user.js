@@ -163,6 +163,31 @@ const userController = {
       return res.status(500).send({ message: err });
     }
   },
+  searchUsers: async (req, res) => {
+    try {
+      let username = req.params.username;
+      let usersFound = await User.find({
+        username: { $regex: "^" + username + ".+", $options: "gim" }
+      }).select("-password");
+      if (!usersFound)
+        return res.status(404).send({ message: "User not found" });
+
+      let idUsers = [];
+      usersFound.map(function(user) {
+        idUsers.push(user.id);
+      });
+      let follows = await Follow.find({
+        user: req.user,
+        followed: idUsers
+      });
+
+      return res
+        .status(200)
+        .send({ message: "Users sent", users: usersFound, follows: follows });
+    } catch (err) {
+      return res.status(500).send({ message: err });
+    }
+  },
   getUserById: async (req, res) => {
     try {
       let userFound = await User.findOne({
@@ -234,11 +259,6 @@ const userController = {
       user.name = req.body.name;
     }
 
-    /* Password validation */
-    if (req.body.password != "" && req.body.password != undefined) {
-      user.password = req.body.password;
-    }
-
     /* TypeAccount validation */
     if (req.body.typeAccount != "" && req.body.typeAccount != undefined) {
       if (
@@ -274,8 +294,7 @@ const userController = {
       if (
         req.body.sex.toLowerCase() != parameters.sex.male &&
         req.body.sex.toLowerCase() != parameters.sex.female &&
-        req.body.sex.toLowerCase() != parameters.sex.shemale &&
-        req.body.sex.toLowerCase() != parameters.sex.other
+        req.body.sex.toLowerCase() != parameters.sex.unspecified
       ) {
         return res.status(400).send({ message: "Invalid sex" });
       } else {

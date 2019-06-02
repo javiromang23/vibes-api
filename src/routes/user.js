@@ -11,6 +11,7 @@ api.get("/userById/:id", auth, userController.getUserById);
 api.get("/user/:username", auth, userController.getUserByUsername);
 api.get("/user/:username/:imageFile", userController.getImageFile);
 api.get("/check-reset/:hash", userController.checkTokenReset);
+api.get("/search-user/:username", auth, userController.searchUsers);
 api.put(
   "/user/:username",
   [auth, permissions.permissionsValidation],

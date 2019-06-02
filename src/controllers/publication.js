@@ -189,6 +189,10 @@ const publicationController = {
       let user = await User.findOne({ username: req.params.username });
       if (!user) return res.status(404).send({ message: "User not found." });
 
+      let publications = await Publication.find({ user: user.id })
+        .populate("user")
+        .sort("-createdAt");
+
       if (user.id != req.user) {
         if (user.typeAccount == "private") {
           let follow = await Follow.findOne({
@@ -197,15 +201,13 @@ const publicationController = {
             accept: true
           });
           if (!follow)
-            return res
-              .status(401)
-              .send({ message: "This publications is private" });
+            return res.status(401).send({
+              message: "This publications is private",
+              total: publications.length
+            });
         }
       }
 
-      let publications = await Publication.find({ user: user.id }).populate(
-        "user"
-      );
       return res.status(200).send({
         total: publications.length,
         publications: publications
