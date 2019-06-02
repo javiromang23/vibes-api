@@ -12,13 +12,20 @@ const notificationController = {
     if (
       req.params.user != "" &&
       req.params.user != undefined &&
-      req.body.html != undefined &&
-      req.body.html != ""
+      req.body.message != undefined &&
+      req.body.message != "" &&
+      req.body.fromUser != undefined &&
+      req.body.fromUser != ""
     ) {
       let notification = new Notification();
-      notification.html = req.body.html;
+      notification.message = req.body.html;
       notification.user = req.params.user;
       notification.toDate = Date.now();
+      notification.fromUser = req.body.fromUser;
+
+      if (req.body.publication != null && req.body.publication != "") {
+        notification.publication = req.body.publication;
+      }
 
       Notification.create(notification, (err, notificationStored) => {
         if (err)
@@ -51,7 +58,7 @@ const notificationController = {
         message: "Notications found.",
         notifications: notifications
       });
-    });
+    }).populate("user fromUser publication");
   }
 };
 
