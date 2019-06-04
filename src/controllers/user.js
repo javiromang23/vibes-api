@@ -306,7 +306,7 @@ const userController = {
     if (req.files != undefined) {
       if (req.files.avatar != "" && req.files.avatar != undefined) {
         let filePath = req.files.avatar.path;
-        let fileSplit = filePath.split("\\");
+        let fileSplit = filePath.split("/");
         let fileName = fileSplit[fileSplit.length - 1];
         let extSplit = fileName.split(".");
         let fileExt = extSplit[1].toLowerCase();

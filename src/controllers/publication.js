@@ -51,7 +51,7 @@ const publicationController = {
       }
 
       let filePath = req.files.image.path;
-      let fileSplit = filePath.split("\\");
+      let fileSplit = filePath.split("/");
       let fileName = fileSplit[fileSplit.length - 1];
       let extSplit = fileName.split(".");
       let fileExt = extSplit[1].toLowerCase();
