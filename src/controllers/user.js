@@ -435,7 +435,7 @@ const userController = {
       });
       if (
         resetPasswordFound &&
-        !(resetPasswordFound.toExpired.getDate() > Date.now())
+        resetPasswordFound.toExpired.getDate() > Date.now()
       ) {
         return res.status(200).send({
           message:
